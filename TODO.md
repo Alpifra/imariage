@@ -3,9 +3,10 @@
 Suivi d'avancement. Référence : [presentation.md](presentation.md).
 
 ## Phase 0 — Cadrage
-- [ ] Répondre aux questions ouvertes (§10 du cahier des charges)
-- [ ] Valider les points marqués **[À valider]**
-- [ ] Choisir l'hébergement et le nom de domaine
+- [ ] Répondre aux questions ouvertes (§10 du cahier des charges) — reste : date / nombre de convives, couleurs / visuel d'accueil
+- [x] Valider les points marqués **[À valider]**
+- [x] Choisir l'hébergement (VPS)
+- [ ] Choisir le sous-domaine
 - [ ] Récupérer l'identité visuelle (prénoms, couleurs, visuel d'accueil)
 
 ## Phase 1 — Mise en place
@@ -19,8 +20,8 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [ ] Ajouter un remote au dépôt git
 
 ## Phase 2 — Backend
-- [ ] Entités `Guest`, `Photo`, `AdminUser`, `Export` + migrations
-- [ ] Création de convive + génération du jeton d'appareil (hash stocké)
+- [ ] Entités `Guest`, `Device`, `Photo`, `AdminUser`, `Export` + migrations
+- [ ] Création de convive ou rattachement (nom normalisé + confirmation) + génération du jeton d'appareil (hash stocké)
 - [ ] Authentificateur par jeton d'appareil
 - [ ] Endpoint d'upload de photo (validation MIME, taille)
 - [ ] Traitement async : conversion HEIC, orientation EXIF, miniatures, date EXIF
@@ -50,7 +51,6 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 
 ## Phase 5 — Finitions
 - [ ] Habillage graphique aux couleurs du mariage
-- [ ] Mode diaporama (si validé)
 - [ ] `noindex` / `robots.txt`
 - [ ] Tests sur vrais appareils (iPhone / Android), y compris en réseau dégradé
 - [ ] Génération du QR code
