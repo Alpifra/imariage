@@ -11,6 +11,7 @@ framework:
         routing:
             # Route your messages to the transports
             'App\Message\ProcessPhoto': async
+            'App\Message\BuildExport': async
 
 when@test:
     framework:

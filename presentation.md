@@ -103,7 +103,7 @@ Changement d'appareil ou navigateur vidé : quand un convive saisit un Prénom +
 - Cache HTTP long sur les miniatures (immuables).
 
 ### 5.4 Export
-Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
+Voir §4.3. Génération en streaming pour ne pas saturer la mémoire : les originaux sont stockés tels quels dans le ZIP (déjà compressés), ZIP64 pour dépasser 4 Go. Le front suit l'avancement (`processedCount` / `photoCount`) en interrogeant l'export.
 
 ## 6. Accès à la plateforme
 
@@ -130,7 +130,7 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 - **User** : `id` (UUID), `firstName`, `lastName`, `normalizedName` (indexé, non unique à cause des homonymes), `roles` (`ROLE_GUEST` / `ROLE_ADMIN`), `username` (nullable, unique — admins uniquement), `password` (haché, nullable — admins uniquement), `createdAt`
 - **Device** : `id` (UUID), `user` (→ User), `tokenHash` (unique), `createdAt`, `lastSeenAt`
 - **Photo** : `id` (UUID), `author` (→ User), `originalPath`, `thumbnailPath`, `mediumPath`, `mimeType`, `size`, `width`, `height`, `takenAt` (nullable), `createdAt`, `status` (processing / ready / failed)
-- **Export** : `id` (UUID), `status` (pending / processing / ready / failed), `filePath` (nullable), `createdAt`, `requestedBy` (→ User)
+- **Export** : `id` (UUID), `status` (pending / processing / ready / failed), `filePath` (nullable), `createdAt`, `requestedBy` (→ User), `author` (→ User, nullable = tous les convives), `photoCount`, `processedCount`, `fileSize` (nullable), `finishedAt` (nullable)
 
 ### Endpoints API (première version)
 
@@ -147,8 +147,9 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 | GET | `/api/photos/{id}/thumbnail` · `/medium` | Convive / Admin (fichiers JPEG, cache privé immuable) |
 | DELETE | `/api/photos/{id}` | Auteur / Admin |
 | POST | `/api/login` · `/api/logout` | Admin (JSON `username` / `password`, session ; 5 essais / 15 min) |
-| POST | `/api/exports` | Admin |
-| GET | `/api/exports/{id}` | Admin |
+| POST | `/api/exports` | Admin (JSON `author` optionnel = id de convive ; génération asynchrone) |
+| GET | `/api/exports` · `/api/exports/{id}` | Admin (historique, plus récents d'abord ; statut et avancement) |
+| GET | `/api/exports/{id}/download` | Admin (archive ZIP prête) |
 
 ## 8. Exigences non fonctionnelles
 

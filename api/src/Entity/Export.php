@@ -28,10 +28,28 @@ class Export
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $requestedBy;
 
-    public function __construct(User $requestedBy)
+    /** Null when the export covers every guest */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?User $author;
+
+    #[ORM\Column]
+    private int $photoCount = 0;
+
+    #[ORM\Column]
+    private int $processedCount = 0;
+
+    #[ORM\Column(type: 'bigint', nullable: true)]
+    private ?int $fileSize = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $finishedAt = null;
+
+    public function __construct(User $requestedBy, ?User $author = null)
     {
         $this->id = Uuid::v7();
         $this->requestedBy = $requestedBy;
+        $this->author = $author;
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -60,19 +78,54 @@ class Export
         return $this->requestedBy;
     }
 
-    public function markProcessing(): void
+    public function getAuthor(): ?User
     {
-        $this->status = ExportStatus::Processing;
+        return $this->author;
     }
 
-    public function markReady(string $filePath): void
+    public function getPhotoCount(): int
+    {
+        return $this->photoCount;
+    }
+
+    public function getProcessedCount(): int
+    {
+        return $this->processedCount;
+    }
+
+    public function getFileSize(): ?int
+    {
+        return $this->fileSize;
+    }
+
+    public function getFinishedAt(): ?\DateTimeImmutable
+    {
+        return $this->finishedAt;
+    }
+
+    public function markProcessing(int $photoCount): void
+    {
+        $this->status = ExportStatus::Processing;
+        $this->photoCount = $photoCount;
+        $this->processedCount = 0;
+    }
+
+    public function advance(int $processedCount): void
+    {
+        $this->processedCount = $processedCount;
+    }
+
+    public function markReady(string $filePath, int $fileSize): void
     {
         $this->filePath = $filePath;
+        $this->fileSize = $fileSize;
         $this->status = ExportStatus::Ready;
+        $this->finishedAt = new \DateTimeImmutable();
     }
 
     public function markFailed(): void
     {
         $this->status = ExportStatus::Failed;
+        $this->finishedAt = new \DateTimeImmutable();
     }
 }

@@ -69,4 +69,26 @@ class PhotoRepository extends ServiceEntityRepository
             'storageBytes' => (int) $row['storageBytes'],
         ];
     }
+
+    /**
+     * Scalars only: an export may cover thousands of photos and must not fill the identity map.
+     *
+     * @return list<array{originalPath: string, takenAt: ?\DateTimeImmutable, createdAt: \DateTimeImmutable, firstName: string, lastName: string}>
+     */
+    public function findForExport(?User $author): array
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p.originalPath', 'p.takenAt', 'p.createdAt', 'a.firstName', 'a.lastName')
+            ->join('p.author', 'a')
+            ->andWhere('p.status = :ready')
+            ->setParameter('ready', PhotoStatus::Ready)
+            ->orderBy('p.id', 'ASC');
+
+        if (null !== $author) {
+            $queryBuilder->andWhere('p.author = :author')->setParameter('author', $author->getId(), UuidType::NAME);
+        }
+
+        /* @var list<array{originalPath: string, takenAt: ?\DateTimeImmutable, createdAt: \DateTimeImmutable, firstName: string, lastName: string}> */
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

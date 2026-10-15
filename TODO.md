@@ -30,7 +30,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Suppression d'une photo (auteur ou admin)
 - [x] Authentification admin + commande de création de compte (`make sf c="app:create-admin <login> ['Nom affiché']"`)
 - [x] Rate limiting (upload, login)
-- [ ] Export ZIP asynchrone en streaming
+- [x] Export ZIP asynchrone en streaming
 - [x] Protection d'accès par code d'événement
 - [ ] Tests fonctionnels API
 
