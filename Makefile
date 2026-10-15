@@ -10,11 +10,13 @@ FRONT_CONT = $(DOCKER_COMP) exec front
 PHP      = $(PHP_CONT) php
 COMPOSER = $(PHP_CONT) composer
 SYMFONY  = $(PHP_CONT) bin/console
+PHPSTAN  = $(PHP_CONT) vendor/bin/phpstan
+CSFIXER  = $(PHP_CONT) vendor/bin/php-cs-fixer
 NPM      = $(FRONT_CONT) npm
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh mysql front-sh composer vendor sf cc db drop npm
+.PHONY        : help build up start down logs sh mysql front-sh composer vendor sf cc analyse lint fix db drop npm
 
 ## —— 🎵 🐳 iMariage Makefile 🐳 🎵 ————————————————————————————————————————————
 help: ## Outputs this help screen
@@ -60,6 +62,17 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 
 cc: c=c:c ## Clear the cache
 cc: sf
+
+## —— Quality ✅ ————————————————————————————————————————————————————————————————
+analyse: ## Perform a static PHP code test of the project, see config file ./api/phpstan.dist.neon
+	@$(PHPSTAN) analyse --memory-limit=512M
+
+lint: ## Check PHP code style (dry run) and front lint
+	@$(CSFIXER) fix --dry-run --diff
+	@$(NPM) run lint
+
+fix: ## Fix PHP code style
+	@$(CSFIXER) fix
 
 ## —— Database 💾 ———————————————————————————————————————————————————————————————
 db: ## Create and migrate database

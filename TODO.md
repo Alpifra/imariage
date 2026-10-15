@@ -15,7 +15,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [ ] Service worker Messenger (à l'installation de Messenger)
 - [x] Projet Symfony + API Platform (`/api`)
 - [x] Projet React + TypeScript + Vite (`/front`)
-- [ ] Lint / formatage (PHP-CS-Fixer, PHPStan côté API ; oxlint déjà présent côté front)
+- [x] Lint / formatage (PHP-CS-Fixer, PHPStan côté API ; oxlint côté front) — `make lint`, `make fix`, `make analyse`
 - [x] Vérifier le support HEIC d'Imagick dans l'image Docker
 - [ ] Ajouter un remote au dépôt git
 
