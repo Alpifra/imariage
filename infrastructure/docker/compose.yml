@@ -1,0 +1,72 @@
+name: imariage
+
+services:
+
+    caddy:
+        image: caddy:2-alpine
+        depends_on:
+            - php
+            - front
+        environment:
+            SERVER_NAME: ${SERVER_NAME:-localhost}
+        restart: unless-stopped
+        volumes:
+            - caddy_data:/data
+            - caddy_config:/config
+            - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+            - ../../api/public:/srv/app/public:ro
+        ports:
+            - target: 80
+              published: ${HTTP_PORT:-8080}
+              protocol: tcp
+            - target: 443
+              published: ${HTTPS_PORT:-8443}
+              protocol: tcp
+            - target: 443
+              published: ${HTTP3_PORT:-8443}
+              protocol: udp
+
+    php:
+        build:
+            context: .
+            dockerfile: ./php/php.dockerfile
+        depends_on:
+            - database
+        restart: unless-stopped
+        volumes:
+            - var:/srv/app/var
+            - ./php/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+            - ./php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/symfony.ini
+            - ../../api:/srv/app:rw,cached
+        environment:
+            DATABASE_URL: mysql://${MARIADB_USER:-imariage}:${MARIADB_PASSWORD:-password}@database:3306/${MARIADB_DATABASE:-imariage}?serverVersion=mariadb-${MARIADB_VERSION:-11.4}.0&charset=utf8mb4
+            APP_ENV: dev
+
+    database:
+        image: mariadb:${MARIADB_VERSION:-11.4}
+        environment:
+            MARIADB_DATABASE: ${MARIADB_DATABASE:-imariage}
+            MARIADB_USER: ${MARIADB_USER:-imariage}
+            MARIADB_PASSWORD: ${MARIADB_PASSWORD:-password}
+            MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+        volumes:
+            - ./db/data:/var/lib/mysql:rw
+        ports:
+            - "3306:3306"
+
+    front:
+        image: node:24-alpine
+        working_dir: /app
+        command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+        environment:
+            VITE_HMR_CLIENT_PORT: ${HTTPS_PORT:-8443}
+        restart: unless-stopped
+        volumes:
+            - ../../front:/app:rw,cached
+            - front_node_modules:/app/node_modules
+
+volumes:
+    var:
+    caddy_data:
+    caddy_config:
+    front_node_modules:

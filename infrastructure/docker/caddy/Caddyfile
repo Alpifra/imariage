@@ -1,0 +1,19 @@
+{$SERVER_NAME:localhost} {
+	log
+
+	request_body {
+		max_size 200MB
+	}
+
+	@api path /api* /_profiler* /_wdt* /bundles/*
+	handle @api {
+		root * /srv/app/public
+		php_fastcgi php:9000
+		encode zstd gzip
+		file_server
+	}
+
+	handle {
+		reverse_proxy front:5173
+	}
+}
