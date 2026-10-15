@@ -16,7 +16,7 @@ NPM      = $(FRONT_CONT) npm
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh mysql front-sh composer vendor sf cc analyse lint fix db drop npm
+.PHONY        : help build up start down logs sh worker mysql front-sh composer vendor sf cc analyse lint fix db drop npm
 
 ## —— 🎵 🐳 iMariage Makefile 🐳 🎵 ————————————————————————————————————————————
 help: ## Outputs this help screen
@@ -39,6 +39,9 @@ logs: ## Show live logs
 
 sh: ## Connect to the PHP FPM container
 	@$(PHP_CONT) sh
+
+worker: ## Restart the Messenger worker (it keeps the old code in memory)
+	@$(DOCKER_COMP) restart worker
 
 mysql: ## Connect to the database with the MariaDB client
 	@$(DB_CONT) mariadb -u imariage -ppassword imariage

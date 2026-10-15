@@ -1,0 +1,7 @@
+framework:
+    rate_limiter:
+        # A guest may send a whole camera roll at once, then keep adding photos through the evening
+        photo_upload:
+            policy: token_bucket
+            limit: 300
+            rate: { interval: '10 minutes', amount: 100 }

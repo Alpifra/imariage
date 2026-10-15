@@ -1,0 +1,13 @@
+# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
+flysystem:
+    storages:
+        photos.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/photos'
+                lazy_root_creation: true
+                # Group bits drive the ACL mask: without them the www-data ACL entry set by
+                # the PHP entrypoint is masked out for files written by the root worker
+                permissions:
+                    file: { public: 0o664, private: 0o660 }
+                    dir: { public: 0o775, private: 0o770 }

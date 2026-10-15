@@ -42,6 +42,23 @@ services:
             DATABASE_URL: mysql://${MARIADB_USER:-imariage}:${MARIADB_PASSWORD:-password}@database:3306/${MARIADB_DATABASE:-imariage}?serverVersion=mariadb-${MARIADB_VERSION:-11.4}.0&charset=utf8mb4
             APP_ENV: dev
 
+    worker:
+        build:
+            context: .
+            dockerfile: ./php/php.dockerfile
+        command: php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M -vv
+        depends_on:
+            - database
+        restart: unless-stopped
+        volumes:
+            - var:/srv/app/var
+            - ./php/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+            - ./php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/symfony.ini
+            - ../../api:/srv/app:rw,cached
+        environment:
+            DATABASE_URL: mysql://${MARIADB_USER:-imariage}:${MARIADB_PASSWORD:-password}@database:3306/${MARIADB_DATABASE:-imariage}?serverVersion=mariadb-${MARIADB_VERSION:-11.4}.0&charset=utf8mb4
+            APP_ENV: dev
+
     database:
         image: mariadb:${MARIADB_VERSION:-11.4}
         environment:

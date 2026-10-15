@@ -12,7 +12,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 ## Phase 1 — Mise en place
 - [x] Initialiser le dépôt git du projet
 - [x] Environnement Docker (PHP, MariaDB, Caddy, Node) + Makefile
-- [ ] Service worker Messenger (à l'installation de Messenger)
+- [x] Service worker Messenger (`make worker` pour le redémarrer après une modification)
 - [x] Projet Symfony + API Platform (`/api`)
 - [x] Projet React + TypeScript + Vite (`/front`)
 - [x] Lint / formatage (PHP-CS-Fixer, PHPStan côté API ; oxlint côté front) — `make lint`, `make fix`, `make analyse`
@@ -23,13 +23,13 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Entités `User` (rôles guest / admin), `Device`, `Photo`, `Export` + migrations
 - [x] Création de convive ou rattachement (nom normalisé + confirmation) + génération du jeton d'appareil (hash stocké)
 - [x] Authentificateur par jeton d'appareil
-- [ ] Endpoint d'upload de photo (validation MIME, taille)
-- [ ] Traitement async : conversion HEIC, orientation EXIF, miniatures, date EXIF
-- [ ] Stockage via Flysystem
+- [x] Endpoint d'upload de photo (validation MIME, taille)
+- [x] Traitement async : conversion HEIC, orientation EXIF, miniatures, date EXIF
+- [x] Stockage via Flysystem
 - [ ] Liste paginée des photos (+ filtre par convive)
 - [ ] Suppression d'une photo (auteur ou admin)
 - [ ] Authentification admin + commande de création de compte
-- [ ] Rate limiting (upload, login)
+- [ ] Rate limiting (upload fait, login à faire)
 - [ ] Export ZIP asynchrone en streaming
 - [x] Protection d'accès par code d'événement
 - [ ] Tests fonctionnels API

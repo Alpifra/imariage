@@ -134,4 +134,9 @@ class Photo
         $this->takenAt = $takenAt;
         $this->status = PhotoStatus::Ready;
     }
+
+    public function markFailed(): void
+    {
+        $this->status = PhotoStatus::Failed;
+    }
 }
