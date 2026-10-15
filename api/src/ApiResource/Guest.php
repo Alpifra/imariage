@@ -48,6 +48,7 @@ final class Guest
         public readonly string $firstName,
         public readonly string $lastName,
         public readonly int $photoCount,
+        public readonly bool $isAdmin = false,
     ) {
     }
 }

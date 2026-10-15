@@ -146,7 +146,7 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 | GET | `/api/photos/{id}` | Convive / Admin |
 | GET | `/api/photos/{id}/thumbnail` · `/medium` | Convive / Admin (fichiers JPEG, cache privé immuable) |
 | DELETE | `/api/photos/{id}` | Auteur / Admin |
-| POST | `/api/login` | Admin |
+| POST | `/api/login` · `/api/logout` | Admin (JSON `username` / `password`, session ; 5 essais / 15 min) |
 | POST | `/api/exports` | Admin |
 | GET | `/api/exports/{id}` | Admin |
 

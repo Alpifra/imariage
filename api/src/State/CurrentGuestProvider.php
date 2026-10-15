@@ -34,6 +34,7 @@ final class CurrentGuestProvider implements ProviderInterface
             $user->getFirstName(),
             $user->getLastName(),
             $photos->count(['author' => $user]),
+            $user->isAdmin(),
         );
     }
 }

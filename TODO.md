@@ -28,8 +28,8 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Stockage via Flysystem
 - [x] Liste paginée des photos (+ filtre par convive)
 - [x] Suppression d'une photo (auteur ou admin)
-- [ ] Authentification admin + commande de création de compte
-- [ ] Rate limiting (upload fait, login à faire)
+- [x] Authentification admin + commande de création de compte (`make sf c="app:create-admin <login> ['Nom affiché']"`)
+- [x] Rate limiting (upload, login)
 - [ ] Export ZIP asynchrone en streaming
 - [x] Protection d'accès par code d'événement
 - [ ] Tests fonctionnels API

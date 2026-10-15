@@ -49,8 +49,9 @@ final class IdentifyGuestProcessor implements ProcessorInterface
         $lastName = $this->nameNormalizer->clean($data->lastName);
         $normalizedName = $this->nameNormalizer->normalize($firstName, $lastName);
 
-        // Homonyms who answered "not me" have their own account: attach to the first one
-        $existing = $this->users->findOneBy(['normalizedName' => $normalizedName], ['createdAt' => 'ASC']);
+        // Homonyms who answered "not me" have their own account: attach to the first one.
+        // Admins (the only users with a username) are excluded, or typing their name would grant their rights
+        $existing = $this->users->findOneBy(['normalizedName' => $normalizedName, 'username' => null], ['createdAt' => 'ASC']);
 
         if (null !== $existing && null === $data->sameGuest) {
             throw new IdentityCheckRequiredException($firstName.' '.$lastName);
