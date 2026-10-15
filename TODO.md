@@ -21,8 +21,8 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 
 ## Phase 2 — Backend
 - [x] Entités `User` (rôles guest / admin), `Device`, `Photo`, `Export` + migrations
-- [ ] Création de convive ou rattachement (nom normalisé + confirmation) + génération du jeton d'appareil (hash stocké)
-- [ ] Authentificateur par jeton d'appareil
+- [x] Création de convive ou rattachement (nom normalisé + confirmation) + génération du jeton d'appareil (hash stocké)
+- [x] Authentificateur par jeton d'appareil
 - [ ] Endpoint d'upload de photo (validation MIME, taille)
 - [ ] Traitement async : conversion HEIC, orientation EXIF, miniatures, date EXIF
 - [ ] Stockage via Flysystem
@@ -31,7 +31,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [ ] Authentification admin + commande de création de compte
 - [ ] Rate limiting (upload, login)
 - [ ] Export ZIP asynchrone en streaming
-- [ ] Protection d'accès par code d'événement
+- [x] Protection d'accès par code d'événement
 - [ ] Tests fonctionnels API
 
 ## Phase 3 — Frontend convive

@@ -80,7 +80,7 @@ Objectif : reconnaître un appareil sans compte, pour rattacher les photos à un
 
 Approche retenue :
 - Au premier accès, le serveur génère un **jeton aléatoire** (256 bits) associé à l'appareil (`Device`), lui-même rattaché au `User`.
-- Le jeton est stocké côté client (`localStorage` + cookie `HttpOnly` `SameSite=Lax`) et envoyé à chaque requête.
+- Le jeton est stocké côté client dans un cookie `HttpOnly` `Secure` `SameSite=Lax` posé par le serveur (pas de `localStorage` : inaccessible au JavaScript, et envoyé automatiquement, y compris pour les miniatures protégées). Une fois authentifié, le convive a aussi une session.
 - Côté serveur, seul un **hash** du jeton est stocké.
 
 Pourquoi pas un « vrai » fingerprinting navigateur (canvas, user-agent, etc.) : peu fiable (identique entre iPhones du même modèle, change aux mises à jour). Le jeton aléatoire est plus simple et plus fiable.
@@ -108,6 +108,7 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 ## 6. Accès à la plateforme
 
 - Pour éviter qu'un inconnu tombe sur les photos : l'URL d'accès contient un **code d'événement secret** (intégré au QR code). Pas de code à saisir.
+- Le code (variable d'environnement `EVENT_CODE`) n'est exigé qu'à l'identification : ensuite le cookie d'appareil suffit, et changer le code ne déconnecte pas les convives déjà identifiés.
 - Pages non indexées (`noindex`, `robots.txt`).
 
 ## 7. Stack technique
@@ -135,8 +136,9 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 
 | Méthode | Route | Rôle |
 |---------|-------|------|
-| POST | `/api/guests` | Convive (création ou rattachement par Prénom + Nom, + jeton d'appareil) |
-| GET / PATCH | `/api/guests/me` | Convive |
+| GET | `/api/events/{code}` | Public (vérification du code d'événement : 200 / 404) |
+| POST | `/api/guests` | Public avec code d'événement (création ou rattachement par Prénom + Nom, pose le cookie d'appareil ; 409 si le nom est déjà connu et que `sameGuest` n'est pas renseigné) |
+| GET | `/api/guests/me` | Convive |
 | GET | `/api/photos` | Convive / Admin |
 | POST | `/api/photos` | Convive |
 | DELETE | `/api/photos/{id}` | Auteur / Admin |
