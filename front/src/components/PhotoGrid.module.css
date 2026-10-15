@@ -35,10 +35,16 @@
 .tile {
   position: relative;
   aspect-ratio: 1;
-  padding: 0;
-  border: none;
   background: var(--color-bg-grouped);
   overflow: hidden;
+}
+
+.open {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   display: block;
 }
 
@@ -61,6 +67,22 @@
 
 .check {
   position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.check::before {
+  content: '';
+  position: absolute;
   top: 8px;
   left: 8px;
   width: 24px;
@@ -68,14 +90,16 @@
   border-radius: 12px;
   border: 2px solid #ffffff;
   background: rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
+  box-sizing: border-box;
 }
 
-.selected .check {
-  border: none;
+.check svg {
+  position: relative;
+  transform: translate(-2px, -2px);
+}
+
+.selected .check::before {
+  border-color: #ffffff;
   background: var(--color-accent);
 }
 

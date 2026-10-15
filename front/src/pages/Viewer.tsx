@@ -19,6 +19,7 @@ export function Viewer() {
   const gallery = useGallery()
   const navigate = useNavigate()
   const location = useLocation()
+  const base = location.pathname.startsWith('/admin') ? '/admin' : ''
   const fromGallery = (location.state as { fromGallery?: boolean } | null)?.fromGallery === true
   const [standalone, setStandalone] = useState<{ id: string; photo: Photo | null }>()
   const [confirming, setConfirming] = useState(false)
@@ -44,12 +45,12 @@ export function Viewer() {
 
   const close = useCallback(() => {
     if (fromGallery) navigate(-1)
-    else navigate('/', { replace: true })
-  }, [fromGallery, navigate])
+    else navigate(`${base || '/'}${location.search}`, { replace: true })
+  }, [fromGallery, navigate, base, location.search])
 
   const show = useCallback((target: Photo | undefined) => {
-    if (target) navigate(`/photo/${target.id}`, { replace: true, state: location.state })
-  }, [navigate, location.state])
+    if (target) navigate(`${base}/photo/${target.id}${location.search}`, { replace: true, state: location.state })
+  }, [navigate, location.state, location.search, base])
 
   const { loadMore, photos: loaded } = gallery
   useEffect(() => {
@@ -131,7 +132,7 @@ export function Viewer() {
       <main className={styles.viewer}>
         <div className={styles.missing}>
           <p>Cette photo n'est plus disponible.</p>
-          <Button variant="tonal" onClick={() => navigate('/', { replace: true })}>Retour à l'album</Button>
+          <Button variant="tonal" onClick={() => navigate(base || '/', { replace: true })}>Retour à l'album</Button>
         </div>
       </main>
     )

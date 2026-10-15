@@ -15,6 +15,8 @@ export class ApiError extends Error {
 
 interface Problem {
   detail?: string
+  /** json_login failures use this key instead of the problem format */
+  error?: string
   violations?: { propertyPath: string; message: string }[]
 }
 
@@ -35,7 +37,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   if (!response.ok) {
     const problem = (data ?? {}) as Problem
     const violations = Object.fromEntries((problem.violations ?? []).map((v) => [v.propertyPath, v.message]))
-    throw new ApiError(response.status, problem.detail ?? '', violations)
+    throw new ApiError(response.status, problem.detail ?? problem.error ?? '', violations)
   }
 
   return data as T

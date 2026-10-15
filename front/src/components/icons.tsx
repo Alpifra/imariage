@@ -24,3 +24,5 @@ export const AlbumIcon = (p: IconProps) => <Icon strokeWidth={1.5} {...p}><rect 
 export const QrIcon = (p: IconProps) => <Icon strokeWidth={1.9} {...p}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><path d="M14 14h3v3M21 14v.01M17 21h4v-4M14 18v3" /></Icon>
 export const DownloadIcon = (p: IconProps) => <Icon strokeWidth={2} {...p}><path d="M12 4v12M6 10l6 6 6-6M5 20h14" /></Icon>
 export const CloseIcon = (p: IconProps) => <Icon strokeWidth={2.2} {...p}><path d="M6 6l12 12M18 6L6 18" /></Icon>
+export const EyeIcon = (p: IconProps) => <Icon strokeWidth={1.8} {...p}><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></Icon>
+export const EyeOffIcon = (p: IconProps) => <Icon strokeWidth={1.8} {...p}><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.9 3.9M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" /></Icon>

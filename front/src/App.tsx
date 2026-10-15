@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
+import { AdminExport } from './admin/AdminExport'
+import { AdminGallery } from './admin/AdminGallery'
+import { AdminLayout } from './admin/AdminLayout'
+import { AdminLogin } from './admin/AdminLogin'
 import { GalleryProvider } from './gallery/GalleryContext'
 import { Gallery } from './pages/Gallery'
 import { Upload } from './pages/Upload'
@@ -17,6 +21,14 @@ function RequireGuest({ children }: { children: ReactNode }) {
   return children
 }
 
+function RequireAdmin({ children }: { children: ReactNode }) {
+  const { guest } = useSession()
+  if (guest === undefined) return <main aria-busy="true" />
+  if (!guest?.isAdmin) return <Navigate to="/admin/connexion" replace />
+
+  return children
+}
+
 function App() {
   return (
     <SessionProvider>
@@ -28,6 +40,14 @@ function App() {
               <Route path="photo/:id" element={<Viewer />} />
             </Route>
             <Route path="/envoi" element={<RequireGuest><Upload /></RequireGuest>} />
+            <Route path="/admin/connexion" element={<AdminLogin />} />
+            <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
+              <Route element={<AdminGallery />}>
+                <Route index element={null} />
+                <Route path="photo/:id" element={<Viewer />} />
+              </Route>
+              <Route path="export" element={<AdminExport />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </GalleryProvider>

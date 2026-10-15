@@ -44,10 +44,10 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Rafraîchissement automatique des nouvelles photos
 
 ## Phase 4 — Frontend admin
-- [ ] Page de connexion
-- [ ] Galerie admin avec sélection multiple et suppression
-- [ ] Filtre par convive
-- [ ] Lancement et téléchargement de l'export
+- [x] Page de connexion
+- [x] Galerie admin avec sélection multiple et suppression
+- [x] Filtre par convive
+- [x] Lancement et téléchargement de l'export
 
 ## Phase 5 — Finitions
 - [ ] Habillage graphique aux couleurs du mariage

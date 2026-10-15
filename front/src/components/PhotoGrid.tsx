@@ -11,7 +11,9 @@ interface PhotoGridProps {
 }
 
 export function PhotoGrid({ sections, onOpen, selected, onToggle }: PhotoGridProps) {
-  const selecting = selected !== undefined && onToggle !== undefined
+  const selectable = selected !== undefined && onToggle !== undefined
+  // Once something is selected, tapping a tile extends the selection instead of opening it
+  const selecting = selectable && selected.size > 0
 
   return sections.map((section) => (
     <section key={section.key} aria-label={`${section.title}, ${section.sub}`}>
@@ -24,17 +26,16 @@ export function PhotoGrid({ sections, onOpen, selected, onToggle }: PhotoGridPro
           const isSelected = selected?.has(photo.id) ?? false
 
           return (
-            <button
-              key={photo.id}
-              type="button"
-              className={[styles.tile, isSelected && styles.selected].filter(Boolean).join(' ')}
-              aria-label={`Photo de ${photo.authorName}`}
-              aria-pressed={selecting ? isSelected : undefined}
-              onClick={() => (selecting ? onToggle(photo) : onOpen(photo))}
-            >
-              <img src={photo.thumbnailUrl} alt="" loading="lazy" decoding="async" />
-              {selecting && <span className={styles.check} aria-hidden="true">{isSelected && <CheckIcon size={14} />}</span>}
-            </button>
+            <div key={photo.id} className={[styles.tile, isSelected && styles.selected].filter(Boolean).join(' ')}>
+              <button type="button" className={styles.open} aria-label={`Photo de ${photo.authorName}`} onClick={() => (selecting ? onToggle(photo) : onOpen(photo))}>
+                <img src={photo.thumbnailUrl} alt="" loading="lazy" decoding="async" />
+              </button>
+              {selectable && (
+                <button type="button" className={styles.check} aria-label={`Sélectionner la photo de ${photo.authorName}`} aria-pressed={isSelected} onClick={() => onToggle(photo)}>
+                  {isSelected && <CheckIcon size={14} />}
+                </button>
+              )}
+            </div>
           )
         })}
       </div>

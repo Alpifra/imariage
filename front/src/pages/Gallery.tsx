@@ -8,6 +8,7 @@ import { OfflineBanner } from '../components/Toast'
 import { COUPLE_NAMES } from '../config'
 import { groupByMoment } from '../gallery/sections'
 import { useGallery } from '../gallery/gallery'
+import { useLoadMoreSentinel } from '../gallery/useLoadMoreSentinel'
 import { initials, useSession } from '../session/session'
 import { useOnline } from '../session/useOnline'
 import { AddPhotos, type AddPhotosHandle } from '../upload/AddPhotos'
@@ -30,26 +31,14 @@ export function Gallery() {
   const online = useOnline()
   const navigate = useNavigate()
   const addPhotos = useRef<AddPhotosHandle>(null)
-  const sentinel = useRef<HTMLDivElement>(null)
-  const { setFilter, loadMore, hasMore, loadingMore, error } = gallery
+  const sentinel = useLoadMoreSentinel()
+  const { setFilter } = gallery
   const scope: Scope = gallery.filter.mine ? 'mine' : 'all'
 
   // The admin pages share the gallery state and may have left an author filter behind
   useEffect(() => {
     if (gallery.filter.author) setFilter({})
   }, [gallery.filter.author, setFilter])
-
-  useEffect(() => {
-    const element = sentinel.current
-    if (!element || !hasMore || loadingMore || error) return
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) loadMore()
-    }, { rootMargin: '600px 0px' })
-    observer.observe(element)
-
-    return () => observer.disconnect()
-  }, [hasMore, loadingMore, error, loadMore])
 
   const sections = useMemo(() => groupByMoment(gallery.photos), [gallery.photos])
 
