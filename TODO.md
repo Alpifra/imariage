@@ -32,7 +32,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Rate limiting (upload, login)
 - [x] Export ZIP asynchrone en streaming
 - [x] Protection d'accès par code d'événement
-- [ ] Tests fonctionnels API
+- [x] Tests fonctionnels API (`make test-db` une fois, puis `make test`)
 
 ## Phase 3 — Frontend convive
 - [ ] Écran d'accueil + formulaire Prénom / Nom

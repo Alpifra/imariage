@@ -11,3 +11,12 @@ flysystem:
                 permissions:
                     file: { public: 0o664, private: 0o660 }
                     dir: { public: 0o775, private: 0o770 }
+
+when@test:
+    flysystem:
+        storages:
+            photos.storage:
+                adapter: 'local'
+                options:
+                    directory: '%kernel.project_dir%/var/storage/test/photos'
+                    lazy_root_creation: true

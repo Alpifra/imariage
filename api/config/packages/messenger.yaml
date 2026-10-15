@@ -17,5 +17,5 @@ when@test:
     framework:
         messenger:
             transports:
-                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
-                async: 'in-memory://'
+                # Handled inline so that functional tests see processed photos and built exports
+                async: 'sync://'

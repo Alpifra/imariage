@@ -16,7 +16,7 @@ NPM      = $(FRONT_CONT) npm
 
 # Misc
 .DEFAULT_GOAL = help
-.PHONY        : help build up start down logs sh worker mysql front-sh composer vendor sf cc analyse lint fix db drop npm
+.PHONY        : help build up start down logs sh worker mysql front-sh composer vendor sf cc analyse lint fix db drop test-db test npm
 
 ## —— 🎵 🐳 iMariage Makefile 🐳 🎵 ————————————————————————————————————————————
 help: ## Outputs this help screen
@@ -81,6 +81,13 @@ fix: ## Fix PHP code style
 db: ## Create and migrate database
 	@$(SYMFONY) doctrine:database:create -n --if-not-exists
 	@$(SYMFONY) doctrine:migrations:migrate -n --allow-no-migration
+
+test-db: ## Create the test database (granted with the MariaDB root account) and migrate it
+	@$(DB_CONT) sh -c 'mariadb -uroot -p"$$MARIADB_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS imariage_test; GRANT ALL ON imariage_test.* TO \`$$MARIADB_USER\`@\`%\`"'
+	@$(PHP_CONT) bin/console doctrine:migrations:migrate -n --allow-no-migration --env=test
+
+test: ## Run the PHPUnit tests, pass the parameter "c=" to add options, example: make test c="--filter=Photo"
+	@$(PHP_CONT) bin/phpunit $(c)
 
 drop: ## Drop the database
 	@$(SYMFONY) doctrine:database:drop --force --if-exists
