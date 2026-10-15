@@ -31,4 +31,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /srv/app
 
+COPY --chmod=755 php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
