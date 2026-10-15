@@ -139,7 +139,9 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 | GET | `/api/events/{code}` | Public (vérification du code d'événement : 200 / 404) |
 | POST | `/api/guests` | Public avec code d'événement (création ou rattachement par Prénom + Nom, pose le cookie d'appareil ; 409 si le nom est déjà connu et que `sameGuest` n'est pas renseigné) |
 | GET | `/api/guests/me` | Convive |
-| GET | `/api/photos` | Convive / Admin |
+| GET | `/api/guests` · `/api/guests/{id}` | Admin (convives avec leur nombre de photos) |
+| GET | `/api/album` | Convive / Admin (nombre de photos, de contributeurs, espace utilisé) |
+| GET | `/api/photos` | Convive / Admin (60 par page, plus récentes d'abord ; curseurs `before` / `after` = id de photo ; filtres `mine`, `author`) |
 | POST | `/api/photos` | Convive (multipart, champ `file`) |
 | GET | `/api/photos/{id}` | Convive / Admin |
 | GET | `/api/photos/{id}/thumbnail` · `/medium` | Convive / Admin (fichiers JPEG, cache privé immuable) |

@@ -26,8 +26,8 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Endpoint d'upload de photo (validation MIME, taille)
 - [x] Traitement async : conversion HEIC, orientation EXIF, miniatures, date EXIF
 - [x] Stockage via Flysystem
-- [ ] Liste paginée des photos (+ filtre par convive)
-- [ ] Suppression d'une photo (auteur ou admin)
+- [x] Liste paginée des photos (+ filtre par convive)
+- [x] Suppression d'une photo (auteur ou admin)
 - [ ] Authentification admin + commande de création de compte
 - [ ] Rate limiting (upload fait, login à faire)
 - [ ] Export ZIP asynchrone en streaming
