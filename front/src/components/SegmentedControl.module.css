@@ -1,0 +1,27 @@
+.control {
+  height: 52px;
+  padding: 4px;
+  border-radius: 26px;
+  background: rgba(242, 242, 247, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  gap: 2px;
+}
+
+.option {
+  flex: 1 1 0;
+  height: 44px;
+  border: none;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--color-label-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.option[aria-selected='true'] {
+  background: var(--color-bg);
+  color: var(--color-label);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}

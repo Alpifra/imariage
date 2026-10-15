@@ -35,13 +35,13 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [x] Tests fonctionnels API (`make test-db` une fois, puis `make test`)
 
 ## Phase 3 — Frontend convive
-- [ ] Écran d'accueil + formulaire Prénom / Nom
-- [ ] Persistance de l'identité sur l'appareil
-- [ ] Upload multiple avec file d'attente, progression et retry
-- [ ] Galerie en grille avec chargement progressif
-- [ ] Lightbox plein écran (swipe)
-- [ ] Filtre « Mes photos » + suppression de ses photos
-- [ ] Rafraîchissement automatique des nouvelles photos
+- [x] Écran d'accueil + formulaire Prénom / Nom
+- [x] Persistance de l'identité sur l'appareil
+- [x] Upload multiple avec file d'attente, progression et retry
+- [x] Galerie en grille avec chargement progressif
+- [x] Lightbox plein écran (swipe)
+- [x] Filtre « Mes photos » + suppression de ses photos
+- [x] Rafraîchissement automatique des nouvelles photos
 
 ## Phase 4 — Frontend admin
 - [ ] Page de connexion

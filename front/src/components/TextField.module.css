@@ -1,0 +1,70 @@
+.group {
+  background: var(--color-bg-grouped);
+  border-radius: var(--radius-field);
+  display: flex;
+  flex-direction: column;
+}
+
+.separator {
+  height: 1px;
+  margin-left: 16px;
+  background: var(--color-separator);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 16px 8px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-field);
+  background: var(--color-bg-grouped);
+}
+
+.group .field {
+  background: transparent;
+}
+
+.field:focus-within {
+  background: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.field:focus-within .label {
+  color: var(--color-accent);
+}
+
+.invalid,
+.invalid:focus-within {
+  background: var(--color-bg);
+  border-color: var(--color-danger);
+}
+
+.label {
+  font: var(--text-footnote);
+  font-weight: 500;
+  color: var(--color-label-2);
+}
+
+.invalid .label,
+.invalid:focus-within .label {
+  color: var(--color-danger);
+}
+
+.input {
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 17px;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.error {
+  font: var(--text-footnote);
+  font-weight: 500;
+  color: var(--color-danger);
+}
