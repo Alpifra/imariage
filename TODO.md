@@ -20,7 +20,7 @@ Suivi d'avancement. Référence : [presentation.md](presentation.md).
 - [ ] Ajouter un remote au dépôt git
 
 ## Phase 2 — Backend
-- [ ] Entités `Guest`, `Device`, `Photo`, `AdminUser`, `Export` + migrations
+- [ ] Entités `User` (rôles guest / admin), `Device`, `Photo`, `Export` + migrations
 - [ ] Création de convive ou rattachement (nom normalisé + confirmation) + génération du jeton d'appareil (hash stocké)
 - [ ] Authentificateur par jeton d'appareil
 - [ ] Endpoint d'upload de photo (validation MIME, taille)

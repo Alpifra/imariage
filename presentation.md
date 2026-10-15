@@ -18,10 +18,12 @@ Plateforme de partage de photos pour le mariage de **Tristan et Maïwenn** : les
 
 ## 2. Rôles
 
-| Rôle | Authentification | Capacités |
-|------|------------------|-----------|
-| Convive | Nom + Prénom, rattachés à l'appareil | Déposer, voir la galerie, supprimer ses propres photos |
-| Admin (mariés / organisateur) | Identifiant + mot de passe | Tout ce que fait un convive + supprimer n'importe quelle photo, exporter |
+Convives et admins sont tous des `User`, distingués par leur rôle.
+
+| Rôle | Rôle Symfony | Authentification | Capacités |
+|------|--------------|------------------|-----------|
+| Convive | `ROLE_GUEST` | Nom + Prénom, rattachés à l'appareil | Déposer, voir la galerie, supprimer ses propres photos |
+| Admin (mariés / organisateur) | `ROLE_ADMIN` (hérite de `ROLE_GUEST`) | Identifiant + mot de passe | Tout ce que fait un convive + supprimer n'importe quelle photo, exporter |
 
 ## 3. Fonctionnalités convive
 
@@ -77,7 +79,7 @@ Plateforme de partage de photos pour le mariage de **Tristan et Maïwenn** : les
 Objectif : reconnaître un appareil sans compte, pour rattacher les photos à un convive et lui permettre de gérer les siennes.
 
 Approche retenue :
-- Au premier accès, le serveur génère un **jeton aléatoire** (UUID v4 / 256 bits) associé à l'appareil (`Device`), lui-même rattaché au `Guest`.
+- Au premier accès, le serveur génère un **jeton aléatoire** (256 bits) associé à l'appareil (`Device`), lui-même rattaché au `User`.
 - Le jeton est stocké côté client (`localStorage` + cookie `HttpOnly` `SameSite=Lax`) et envoyé à chaque requête.
 - Côté serveur, seul un **hash** du jeton est stocké.
 
@@ -124,11 +126,10 @@ Voir §4.3. Génération en streaming pour ne pas saturer la mémoire.
 
 ### Modèle de données (première version)
 
-- **Guest** : `id` (UUID), `firstName`, `lastName`, `normalizedName` (indexé, non unique à cause des homonymes), `createdAt`
-- **Device** : `id` (UUID), `guest` (→ Guest), `tokenHash`, `createdAt`, `lastSeenAt`
-- **Photo** : `id` (UUID), `guest` (→ Guest), `originalPath`, `thumbnailPath`, `mediumPath`, `mimeType`, `size`, `width`, `height`, `takenAt` (nullable), `createdAt`, `status` (processing / ready)
-- **AdminUser** : `id`, `username`, `password` (haché), `roles`
-- **Export** : `id`, `status`, `filePath`, `createdAt`, `requestedBy`
+- **User** : `id` (UUID), `firstName`, `lastName`, `normalizedName` (indexé, non unique à cause des homonymes), `roles` (`ROLE_GUEST` / `ROLE_ADMIN`), `username` (nullable, unique — admins uniquement), `password` (haché, nullable — admins uniquement), `createdAt`
+- **Device** : `id` (UUID), `user` (→ User), `tokenHash` (unique), `createdAt`, `lastSeenAt`
+- **Photo** : `id` (UUID), `author` (→ User), `originalPath`, `thumbnailPath`, `mediumPath`, `mimeType`, `size`, `width`, `height`, `takenAt` (nullable), `createdAt`, `status` (processing / ready)
+- **Export** : `id` (UUID), `status` (pending / processing / ready / failed), `filePath` (nullable), `createdAt`, `requestedBy` (→ User)
 
 ### Endpoints API (première version)
 
