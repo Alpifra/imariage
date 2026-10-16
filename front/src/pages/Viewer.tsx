@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
+import { TransformComponent, TransformWrapper, type ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch'
 import { api, ApiError } from '../api/client'
 import type { Photo } from '../api/types'
 import { Button } from '../components/Button'
@@ -17,6 +18,11 @@ const AXIS_LOCK_PX = 10
 // Matches the transform transition in Viewer.module.css
 const SLIDE_MS = 200
 const SLIDE_GAP_PX = 16
+// The medium file is 1600px on its long side: zooming further only shows blur
+const MAX_ZOOM = 4
+const DOUBLE_TAP_ZOOM = 2.5
+const DOUBLE_TAP_MS = 300
+const TAP_MS = 250
 
 export function Viewer() {
   const { id = '' } = useParams()
@@ -32,7 +38,12 @@ export function Viewer() {
   const [deleteError, setDeleteError] = useState(false)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [sliding, setSliding] = useState<{ from: string; direction: 1 | -1 }>()
+  const [zoomedId, setZoomedId] = useState<string>()
   const drag = useRef<{ x: number; y: number; pointer: number; axis?: 'x' | 'y' } | null>(null)
+  const pointers = useRef(new Set<number>())
+  const press = useRef<{ x: number; y: number; time: number }>(undefined)
+  const lastTap = useRef<{ x: number; y: number; time: number }>(undefined)
+  const zoomControls = useRef<ReactZoomPanPinchContentRef>(null)
   const slideTimer = useRef<number>(undefined)
   const strip = useRef<HTMLDivElement>(null)
   const deleted = useRef<string | null>(null)
@@ -103,9 +114,19 @@ export function Viewer() {
     return () => window.removeEventListener('keydown', listener)
   }, [confirming, slide, close])
 
+  const zoomed = zoomedId === id
+
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     // Capturing the pointer would retarget the click away from the arrow buttons
     if ((event.target as Element).closest('button')) return
+    pointers.current.add(event.pointerId)
+    press.current = pointers.current.size === 1 ? { x: event.clientX, y: event.clientY, time: event.timeStamp } : undefined
+    // A second finger means a pinch, and a zoomed photo pans: both belong to the zoom library
+    if (pointers.current.size > 1 || zoomed) {
+      drag.current = null
+      setOffset({ x: 0, y: 0 })
+      return
+    }
     drag.current = { x: event.clientX, y: event.clientY, pointer: event.pointerId }
     event.currentTarget.setPointerCapture(event.pointerId)
   }
@@ -127,7 +148,28 @@ export function Viewer() {
     }
   }
 
-  const onPointerUp = () => {
+  // The library's own double tap also reacts to the dblclick that follows on touch screens, undoing itself
+  const onTap = (x: number, y: number, time: number) => {
+    const before = lastTap.current
+    if (!before || time - before.time > DOUBLE_TAP_MS || Math.hypot(x - before.x, y - before.y) > 3 * AXIS_LOCK_PX) {
+      lastTap.current = { x, y, time }
+      return
+    }
+    lastTap.current = undefined
+    // Deferred past the touchend, whose pan release would cancel this animation
+    window.setTimeout(() => {
+      if (zoomed) void zoomControls.current?.resetTransform(SLIDE_MS)
+      else void zoomControls.current?.zoomToPoint(DOUBLE_TAP_ZOOM, x, y, SLIDE_MS)
+    })
+  }
+
+  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    pointers.current.delete(event.pointerId)
+    const start = press.current
+    press.current = undefined
+    if (start && event.type === 'pointerup' && event.timeStamp - start.time < TAP_MS && Math.hypot(event.clientX - start.x, event.clientY - start.y) < AXIS_LOCK_PX) {
+      onTap(event.clientX, event.clientY, event.timeStamp)
+    }
     if (!drag.current) return
     drag.current = null
     // Leaving the photo where it was dropped avoids a snap back while the viewer unmounts
@@ -208,14 +250,25 @@ export function Viewer() {
         onPointerCancel={onPointerUp}
       >
         {slides.map(([item, position]) => item && (
-          <img
+          <div
             key={item.id}
-            src={item.mediumUrl}
-            alt={position === 0 ? `Photo de ${item.authorName}` : ''}
+            className={styles.slide}
             aria-hidden={position !== 0}
-            draggable={false}
             style={{ transform: `translate(calc(${(position - shift) * 100}% + ${(position - shift) * SLIDE_GAP_PX + offset.x}px), ${offset.y}px)` }}
-          />
+          >
+            <TransformWrapper
+              ref={position === 0 ? zoomControls : undefined}
+              disabled={position !== 0}
+              maxScale={MAX_ZOOM}
+              panning={{ disabled: !zoomed, velocityDisabled: true }}
+              doubleClick={{ disabled: true }}
+              onTransform={(_, state) => setZoomedId((current) => state.scale > 1.01 ? item.id : current === item.id ? undefined : current)}
+            >
+              <TransformComponent wrapperClass={styles.zoom} contentClass={styles.zoom}>
+                <img src={item.mediumUrl} alt={position === 0 ? `Photo de ${item.authorName}` : ''} draggable={false} />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>
         ))}
         {previous && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.prev}`} onClick={() => slide(-1)} aria-label="Photo précédente"><ChevronLeftIcon size={24} /></button>}
         {next && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.next}`} onClick={() => slide(1)} aria-label="Photo suivante"><ChevronRightIcon size={24} /></button>}
