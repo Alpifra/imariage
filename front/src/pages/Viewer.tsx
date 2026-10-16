@@ -14,6 +14,9 @@ import styles from './Viewer.module.css'
 const SWIPE_THRESHOLD_PX = 60
 const CLOSE_THRESHOLD_PX = 100
 const AXIS_LOCK_PX = 10
+// Matches the transform transition in Viewer.module.css
+const SLIDE_MS = 200
+const SLIDE_GAP_PX = 16
 
 export function Viewer() {
   const { id = '' } = useParams()
@@ -28,7 +31,9 @@ export function Viewer() {
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(false)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
+  const [sliding, setSliding] = useState<{ from: string; direction: 1 | -1 }>()
   const drag = useRef<{ x: number; y: number; pointer: number; axis?: 'x' | 'y' } | null>(null)
+  const slideTimer = useRef<number>(undefined)
   const strip = useRef<HTMLDivElement>(null)
   const deleted = useRef<string | null>(null)
 
@@ -59,13 +64,17 @@ export function Viewer() {
     if (index >= 0 && index >= loaded.length - 3) loadMore()
   }, [index, loaded.length, loadMore])
 
-  const previousUrl = previous?.mediumUrl
-  const nextUrl = next?.mediumUrl
-  useEffect(() => {
-    for (const url of [nextUrl, previousUrl]) {
-      if (url) new Image().src = url
-    }
-  }, [nextUrl, previousUrl])
+  const slide = useCallback((direction: 1 | -1) => {
+    const target = direction === 1 ? next : previous
+    if (!target || sliding) return
+    setSliding({ from: id, direction })
+    slideTimer.current = window.setTimeout(() => {
+      show(target)
+      setSliding(undefined)
+    }, SLIDE_MS)
+  }, [next, previous, sliding, id, show])
+
+  useEffect(() => () => window.clearTimeout(slideTimer.current), [])
 
   const hideDeleteError = useCallback(() => setDeleteError(false), [])
 
@@ -85,14 +94,14 @@ export function Viewer() {
   useEffect(() => {
     if (confirming) return
     const listener = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') show(previous)
-      if (event.key === 'ArrowRight') show(next)
+      if (event.key === 'ArrowLeft') slide(-1)
+      if (event.key === 'ArrowRight') slide(1)
       if (event.key === 'Escape') close()
     }
     window.addEventListener('keydown', listener)
 
     return () => window.removeEventListener('keydown', listener)
-  }, [confirming, previous, next, show, close])
+  }, [confirming, slide, close])
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     // Capturing the pointer would retarget the click away from the arrow buttons
@@ -126,8 +135,8 @@ export function Viewer() {
       close()
       return
     }
-    if (offset.x > SWIPE_THRESHOLD_PX) show(previous)
-    if (offset.x < -SWIPE_THRESHOLD_PX) show(next)
+    if (offset.x > SWIPE_THRESHOLD_PX) slide(-1)
+    if (offset.x < -SWIPE_THRESHOLD_PX) slide(1)
     setOffset({ x: 0, y: 0 })
   }
 
@@ -168,6 +177,9 @@ export function Viewer() {
   if (!photo) return <main className={styles.viewer} aria-busy="true" />
 
   const canDelete = photo.mine || guest?.isAdmin === true
+  // Keyed by photo id, the neighbour that slid in stays mounted and in place once the URL changes
+  const shift = sliding?.from === photo.id ? sliding.direction : 0
+  const slides: [Photo | undefined, number][] = [[previous, -1], [photo, 0], [next, 1]]
 
   return (
     <main
@@ -195,9 +207,18 @@ export function Viewer() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        <img key={photo.id} src={photo.mediumUrl} alt={`Photo de ${photo.authorName}`} draggable={false} style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }} />
-        {previous && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.prev}`} onClick={() => show(previous)} aria-label="Photo précédente"><ChevronLeftIcon size={24} /></button>}
-        {next && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.next}`} onClick={() => show(next)} aria-label="Photo suivante"><ChevronRightIcon size={24} /></button>}
+        {slides.map(([item, position]) => item && (
+          <img
+            key={item.id}
+            src={item.mediumUrl}
+            alt={position === 0 ? `Photo de ${item.authorName}` : ''}
+            aria-hidden={position !== 0}
+            draggable={false}
+            style={{ transform: `translate(calc(${(position - shift) * 100}% + ${(position - shift) * SLIDE_GAP_PX + offset.x}px), ${offset.y}px)` }}
+          />
+        ))}
+        {previous && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.prev}`} onClick={() => slide(-1)} aria-label="Photo précédente"><ChevronLeftIcon size={24} /></button>}
+        {next && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.next}`} onClick={() => slide(1)} aria-label="Photo suivante"><ChevronRightIcon size={24} /></button>}
       </div>
 
       {index >= 0 && (
