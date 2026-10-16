@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# Never cancel a deploy halfway: the next one waits
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to production
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEPLOY_PATH: sites/imariage
+      PHP_BIN: /opt/php8.5/bin/php
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.SHA }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Build the front
+        working-directory: front
+        run: |
+          npm ci
+          npm run build
+
+      - name: Package the release
+        run: |
+          mkdir build
+          git archive HEAD:api | tar -x -C build
+          cp -R front/dist/. build/public/
+          tar -czf "$SHA.tar.gz" -C build .
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy
+
+      - name: Upload and switch
+        env:
+          TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+        run: |
+          ssh -i ~/.ssh/id_deploy "$TARGET" "mkdir -p $DEPLOY_PATH"
+          scp -i ~/.ssh/id_deploy "$SHA.tar.gz" infrastructure/deploy/deploy.sh "$TARGET:$DEPLOY_PATH/"
+          ssh -i ~/.ssh/id_deploy "$TARGET" "bash $DEPLOY_PATH/deploy.sh $SHA.tar.gz $PHP_BIN"
