@@ -56,7 +56,7 @@
   min-height: 0;
   position: relative;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: none;
   user-select: none;
 }
 
@@ -69,7 +69,11 @@
   -webkit-user-drag: none;
 }
 
-.settling img {
+.settling {
+  transition: background-color 0.2s ease-out;
+}
+
+.settling .stage img {
   transition: transform 0.2s ease-out;
 }
 

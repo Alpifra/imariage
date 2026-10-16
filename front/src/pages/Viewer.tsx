@@ -12,6 +12,8 @@ import { useSession } from '../session/session'
 import styles from './Viewer.module.css'
 
 const SWIPE_THRESHOLD_PX = 60
+const CLOSE_THRESHOLD_PX = 100
+const AXIS_LOCK_PX = 10
 
 export function Viewer() {
   const { id = '' } = useParams()
@@ -25,8 +27,8 @@ export function Viewer() {
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(false)
-  const [offset, setOffset] = useState(0)
-  const drag = useRef<{ x: number; pointer: number } | null>(null)
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
+  const drag = useRef<{ x: number; y: number; pointer: number; axis?: 'x' | 'y' } | null>(null)
   const strip = useRef<HTMLDivElement>(null)
   const deleted = useRef<string | null>(null)
 
@@ -95,23 +97,38 @@ export function Viewer() {
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     // Capturing the pointer would retarget the click away from the arrow buttons
     if ((event.target as Element).closest('button')) return
-    drag.current = { x: event.clientX, pointer: event.pointerId }
+    drag.current = { x: event.clientX, y: event.clientY, pointer: event.pointerId }
     event.currentTarget.setPointerCapture(event.pointerId)
   }
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (drag.current?.pointer !== event.pointerId) return
-    const delta = event.clientX - drag.current.x
-    // Resist at both ends of the album
-    setOffset((delta > 0 && !previous) || (delta < 0 && !next) ? delta / 4 : delta)
+    const current = drag.current
+    if (current?.pointer !== event.pointerId) return
+    const dx = event.clientX - current.x
+    const dy = event.clientY - current.y
+    if (!current.axis) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < AXIS_LOCK_PX) return
+      current.axis = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x'
+    }
+    if (current.axis === 'y') {
+      setOffset({ x: 0, y: dy > 0 ? dy : dy / 4 })
+    } else {
+      // Resist at both ends of the album
+      setOffset({ x: (dx > 0 && !previous) || (dx < 0 && !next) ? dx / 4 : dx, y: 0 })
+    }
   }
 
   const onPointerUp = () => {
     if (!drag.current) return
     drag.current = null
-    if (offset > SWIPE_THRESHOLD_PX) show(previous)
-    if (offset < -SWIPE_THRESHOLD_PX) show(next)
-    setOffset(0)
+    // Leaving the photo where it was dropped avoids a snap back while the viewer unmounts
+    if (offset.y > CLOSE_THRESHOLD_PX) {
+      close()
+      return
+    }
+    if (offset.x > SWIPE_THRESHOLD_PX) show(previous)
+    if (offset.x < -SWIPE_THRESHOLD_PX) show(next)
+    setOffset({ x: 0, y: 0 })
   }
 
   const remove = async () => {
@@ -153,7 +170,11 @@ export function Viewer() {
   const canDelete = photo.mine || guest?.isAdmin === true
 
   return (
-    <main className={styles.viewer} aria-label="Visionneuse">
+    <main
+      className={[styles.viewer, offset.x === 0 && offset.y === 0 && styles.settling].filter(Boolean).join(' ')}
+      aria-label="Visionneuse"
+      style={offset.y > 0 ? { backgroundColor: `color-mix(in srgb, var(--color-viewer) ${Math.max(0, 100 - offset.y / 4)}%, transparent)` } : undefined}
+    >
       <header className={styles.header}>
         <button type="button" className={styles.iconButton} onClick={close} aria-label="Fermer"><CloseIcon size={24} /></button>
         <div className={styles.meta}>
@@ -168,13 +189,13 @@ export function Viewer() {
       </header>
 
       <div
-        className={[styles.stage, offset === 0 && styles.settling].filter(Boolean).join(' ')}
+        className={styles.stage}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        <img key={photo.id} src={photo.mediumUrl} alt={`Photo de ${photo.authorName}`} draggable={false} style={{ transform: `translateX(${offset}px)` }} />
+        <img key={photo.id} src={photo.mediumUrl} alt={`Photo de ${photo.authorName}`} draggable={false} style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }} />
         {previous && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.prev}`} onClick={() => show(previous)} aria-label="Photo précédente"><ChevronLeftIcon size={24} /></button>}
         {next && <button type="button" className={`${styles.iconButton} ${styles.nav} ${styles.next}`} onClick={() => show(next)} aria-label="Photo suivante"><ChevronRightIcon size={24} /></button>}
       </div>
