@@ -57,6 +57,14 @@ export function Viewer() {
     if (index >= 0 && index >= loaded.length - 3) loadMore()
   }, [index, loaded.length, loadMore])
 
+  const previousUrl = previous?.mediumUrl
+  const nextUrl = next?.mediumUrl
+  useEffect(() => {
+    for (const url of [nextUrl, previousUrl]) {
+      if (url) new Image().src = url
+    }
+  }, [nextUrl, previousUrl])
+
   const hideDeleteError = useCallback(() => setDeleteError(false), [])
 
   // The gallery stays mounted underneath to keep its scroll position
