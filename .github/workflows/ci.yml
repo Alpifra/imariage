@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (lint, PHPStan, PHPUnit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPOSE: docker compose -f infrastructure/docker/compose.yml
+    steps:
+      - uses: actions/checkout@v5
+
+      # Same image as the dev stack: PHP 8.5 with Imagick built with HEIC support, needed by the tests
+      - name: Start PHP and MariaDB
+        run: $COMPOSE up -d --build php database
+
+      - name: Wait for MariaDB
+        run: timeout 60 sh -c "until $COMPOSE exec -T database mariadb-admin ping -uroot -proot --silent; do sleep 1; done"
+
+      - name: Install Composer dependencies
+        run: $COMPOSE exec -T php composer install --prefer-dist --no-progress --no-interaction
+
+      - name: PHP CS Fixer
+        run: $COMPOSE exec -T php vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: PHPStan
+        run: $COMPOSE exec -T php vendor/bin/phpstan analyse --memory-limit=512M --no-progress
+
+      - name: Create the test database
+        run: |
+          $COMPOSE exec -T database sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS imariage_test; GRANT ALL ON imariage_test.* TO \`$MARIADB_USER\`@\`%\`"'
+          $COMPOSE exec -T php bin/console doctrine:migrations:migrate -n --allow-no-migration --env=test
+
+      - name: PHPUnit
+        run: $COMPOSE exec -T php bin/phpunit
+
+  front:
+    name: Front (lint, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
