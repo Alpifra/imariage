@@ -88,8 +88,8 @@ export function Welcome() {
       <p className={styles.intro}>Partagez vos plus beaux moments de la journée.</p>
       <form className={styles.form} onSubmit={onSubmit} noValidate>
         <FieldGroup>
-          <TextField label="Prénom" autoComplete="given-name" placeholder="Camille" value={firstName} onChange={(event) => setFirstName(event.target.value)} error={errors.firstName} maxLength={100} />
-          <TextField label="Nom" autoComplete="family-name" placeholder="Durand" value={lastName} onChange={(event) => setLastName(event.target.value)} error={errors.lastName} maxLength={100} />
+          <TextField label="Prénom" autoComplete="given-name" value={firstName} onChange={(event) => setFirstName(event.target.value)} error={errors.firstName} maxLength={100} />
+          <TextField label="Nom" autoComplete="family-name" value={lastName} onChange={(event) => setLastName(event.target.value)} error={errors.lastName} maxLength={100} />
         </FieldGroup>
         {fieldError && <FieldError>{fieldError}</FieldError>}
         <Button type="submit" block disabled={busy || codeState === 'checking'}>C'est parti</Button>

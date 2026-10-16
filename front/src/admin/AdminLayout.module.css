@@ -90,8 +90,14 @@
   color: var(--color-label-2);
 }
 
+.guests {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .guest {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: 20px;
   display: flex;

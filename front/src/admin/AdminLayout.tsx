@@ -61,7 +61,7 @@ export function AdminLayout() {
         <aside className={styles.sidebar}>
           <nav aria-label="Espace des mariés"><Navigation /></nav>
           {onPhotos && guests.length > 0 && (
-            <nav aria-labelledby="guests-title">
+            <nav aria-labelledby="guests-title" className={styles.guests}>
               <h2 id="guests-title" className={styles.sectionTitle}>Invités</h2>
               <Link to="/admin" className={styles.guest} aria-current={author === null}>
                 <span>Tous les invités</span><span className={styles.count}>{formatCount(total)}</span>

@@ -85,6 +85,8 @@ export function Viewer() {
   }, [confirming, previous, next, show, close])
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    // Capturing the pointer would retarget the click away from the arrow buttons
+    if ((event.target as Element).closest('button')) return
     drag.current = { x: event.clientX, pointer: event.pointerId }
     event.currentTarget.setPointerCapture(event.pointerId)
   }
