@@ -46,6 +46,7 @@ export function Viewer() {
   const zoomControls = useRef<ReactZoomPanPinchContentRef>(null)
   const slideTimer = useRef<number>(undefined)
   const strip = useRef<HTMLDivElement>(null)
+  const stripPlaced = useRef(false)
   const deleted = useRef<string | null>(null)
 
   const index = gallery.photos.findIndex((photo) => photo.id === id)
@@ -98,9 +99,16 @@ export function Viewer() {
     }
   }, [])
 
+  // The strip follows the photo as soon as it starts sliding, so both move together
+  const slidingTo = sliding?.from === id ? (sliding.direction === 1 ? next : previous) : undefined
+  const activeId = slidingTo?.id ?? id
+
   useEffect(() => {
-    strip.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' })
-  }, [id])
+    const thumbnail = strip.current?.querySelector('[aria-current="true"]')
+    if (!thumbnail) return
+    thumbnail.scrollIntoView({ inline: 'center', block: 'nearest', behavior: stripPlaced.current ? 'smooth' : 'instant' })
+    stripPlaced.current = true
+  }, [activeId])
 
   useEffect(() => {
     if (confirming) return
@@ -278,7 +286,7 @@ export function Viewer() {
         <>
           <div ref={strip} className={styles.strip} aria-label="Miniatures">
             {gallery.photos.map((item) => (
-              <button key={item.id} type="button" aria-current={item.id === photo.id} aria-label={`Photo de ${item.authorName}`} onClick={() => show(item)}>
+              <button key={item.id} type="button" aria-current={item.id === activeId} aria-label={`Photo de ${item.authorName}`} onClick={() => show(item)}>
                 <img src={item.thumbnailUrl} alt="" loading="lazy" />
               </button>
             ))}
