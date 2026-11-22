@@ -52,6 +52,10 @@ Chaque push sur `main` dont la CI passe déclenche le workflow `Deploy` (relanç
   cd ~/sites/imariage && ls -1t releases && ln -sfn releases/<version> current
   ```
   Une migration déjà jouée n'est pas annulée.
+- **Repartir à neuf après les tests** (supprime toutes les photos, les exports et les comptes invités ; garde les comptes admin) :
+  ```bash
+  cd ~/sites/imariage/current && /opt/php8.5/bin/php bin/console app:reset-album
+  ```
 - **Messages en échec** :
   ```bash
   cd ~/sites/imariage/current && /opt/php8.5/bin/php bin/console messenger:failed:show
