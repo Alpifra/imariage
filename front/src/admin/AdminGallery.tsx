@@ -1,39 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useNavigate, useSearchParams } from 'react-router'
-import { api } from '../api/client'
 import type { Photo } from '../api/types'
 import { Button } from '../components/Button'
 import { CloseIcon, TrashIcon } from '../components/icons'
 import { GridSkeleton, PhotoGrid } from '../components/PhotoGrid'
 import { Dialog } from '../components/Sheet'
 import { Toast } from '../components/Toast'
+import { deletePhotos } from '../gallery/deletePhotos'
 import { useGallery } from '../gallery/gallery'
 import { groupByMoment } from '../gallery/sections'
 import { useLoadMoreSentinel } from '../gallery/useLoadMoreSentinel'
 import { GUEST_PARAM, useAdmin } from './admin'
 import { formatBytes, formatCount, plural } from './format'
 import styles from './AdminGallery.module.css'
-
-const DELETE_CONCURRENCY = 4
-
-async function deleteAll(ids: string[]): Promise<{ deleted: string[]; failed: number }> {
-  const queue = [...ids]
-  const deleted: string[] = []
-  let failed = 0
-  const worker = async () => {
-    for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
-      try {
-        await api.deletePhoto(id)
-        deleted.push(id)
-      } catch {
-        failed++
-      }
-    }
-  }
-  await Promise.all(Array.from({ length: DELETE_CONCURRENCY }, worker))
-
-  return { deleted, failed }
-}
 
 export function AdminGallery() {
   const gallery = useGallery()
@@ -77,7 +56,7 @@ export function AdminGallery() {
 
   const confirmDelete = async () => {
     setDeleting(true)
-    const { deleted, failed } = await deleteAll([...selected])
+    const { deleted, failed } = await deletePhotos([...selected])
     setDeleting(false)
     setConfirming(false)
     remove(deleted)
