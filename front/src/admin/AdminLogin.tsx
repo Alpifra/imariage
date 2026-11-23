@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { api, ApiError } from '../api/client'
 import { Button } from '../components/Button'
+import { Semis } from '../components/Floral'
 import { AlbumIcon, EyeIcon, EyeOffIcon } from '../components/icons'
 import { COUPLE_NAMES } from '../config'
 import { useSession } from '../session/session'
@@ -71,6 +72,7 @@ export function AdminLogin() {
         {error && <p id="admin-error" role="alert" className={styles.error}>{error}</p>}
         <Button type="submit" block disabled={busy}>Se connecter</Button>
       </form>
+      <Semis opacity={0.08} />
     </main>
   )
 }

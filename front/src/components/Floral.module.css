@@ -1,0 +1,18 @@
+.decor {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.semis {
+  inset: 0;
+  background-size: 240px 240px;
+  background-repeat: repeat;
+}
+
+.brin {
+  width: 150px;
+  height: 40px;
+  opacity: 0.85;
+}

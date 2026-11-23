@@ -131,6 +131,9 @@
 }
 
 .thanks {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   min-height: 100dvh;
   max-width: 480px;
   margin: 0 auto;

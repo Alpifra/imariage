@@ -1,4 +1,7 @@
 .screen {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   min-height: 100dvh;
   padding: 24px 16px;
   background: var(--color-bg-grouped);

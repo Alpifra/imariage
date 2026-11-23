@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router'
 import { api, ApiError } from '../api/client'
 import type { Guest, Photo } from '../api/types'
 import { Button } from '../components/Button'
+import { Bouquet, Brin, Semis } from '../components/Floral'
 import { BottomSheet } from '../components/Sheet'
 import { FieldError, FieldGroup, TextField } from '../components/TextField'
 import { COUPLE_INITIALS, COUPLE_NAMES, WEDDING_DETAILS } from '../config'
@@ -95,6 +96,8 @@ export function Welcome() {
         <Button type="submit" block disabled={busy || codeState === 'checking'}>C'est parti</Button>
       </form>
       <div className={styles.hint}>Pas de compte, pas d'application à installer.</div>
+      <Bouquet corner="bottom-right" width={270} x={70} y={50} opacity={0.28} />
+      <Bouquet corner="bottom-left" width={220} x={80} y={70} opacity={0.2} />
 
       {knownName && (
         <BottomSheet labelledBy="known-question">
@@ -131,10 +134,12 @@ function WelcomeBack({ guest, onContinue }: { guest: Guest; onContinue: () => vo
         {remaining > 0 && <div className={styles.more}>+{remaining}</div>}
       </div>
       <div role="status" className={styles.message}>
+        <Brin className={styles.brin} />
         <h1>Ravi de vous revoir, {guest.firstName}&nbsp;!</h1>
         <p>{guest.photoCount === 1 ? 'Votre photo vous attend.' : `Vos ${guest.photoCount} photos vous attendent.`}</p>
       </div>
       <Button block onClick={onContinue} autoFocus>Voir l'album</Button>
+      <Semis opacity={0.07} />
     </main>
   )
 }

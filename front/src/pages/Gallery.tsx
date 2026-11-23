@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router'
 import type { Photo } from '../api/types'
 import { Button } from '../components/Button'
+import { Bouquet } from '../components/Floral'
 import { AlbumIcon, ArrowUpIcon, CloseIcon, PlusIcon, TrashIcon } from '../components/icons'
 import { GridSkeleton, PhotoGrid } from '../components/PhotoGrid'
 import { SegmentedControl } from '../components/SegmentedControl'
@@ -118,6 +119,7 @@ export function Gallery() {
           <span className={styles.avatar} role="img" aria-label={`Connecté en tant que ${guest.firstName} ${guest.lastName}`}>{initials(guest)}</span>
         )}
       </header>
+      <Bouquet corner="top-right" width={190} x={50} y={60} opacity={0.2} />
 
       {!online && (
         <OfflineBanner title="Hors connexion." className={styles.banner}>
@@ -139,6 +141,7 @@ export function Gallery() {
           <AlbumIcon size={56} />
           <h2>{scope === 'mine' ? 'Vous n’avez pas encore partagé de photo' : 'Aucune photo pour l’instant'}</h2>
           <p>{scope === 'mine' ? 'Les photos que vous ajoutez apparaîtront ici.' : 'Soyez le premier à partager un moment de la journée !'}</p>
+          <Bouquet corner="bottom-right" width={250} x={70} y={0} opacity={0.22} className={styles.emptyBouquet} />
         </div>
       ) : (
         <>

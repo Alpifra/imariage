@@ -1,4 +1,7 @@
 .screen {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   min-height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
@@ -102,6 +105,9 @@
 }
 
 .centered {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   min-height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
@@ -146,6 +152,10 @@
   align-items: center;
   gap: 8px;
   text-align: center;
+}
+
+.brin {
+  margin-bottom: 4px;
 }
 
 .message h1 {

@@ -1,4 +1,7 @@
 .screen {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   min-height: 100dvh;
   padding-bottom: calc(var(--safe-bottom) + 160px);
 }
@@ -96,6 +99,12 @@
   align-items: center;
   gap: 12px;
   text-align: center;
+}
+
+/* The dock hides the bottom of the screen, so the bouquet sits just above it */
+.emptyBouquet {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 64px) !important;
 }
 
 .empty svg {

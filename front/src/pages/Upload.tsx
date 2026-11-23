@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router'
 import { Button } from '../components/Button'
 import { buttonClass } from '../components/buttonClass'
+import { Bouquet } from '../components/Floral'
 import { CheckIcon, ChevronLeftIcon } from '../components/icons'
 import { ProgressBar } from '../components/ProgressBar'
 import { OfflineBanner } from '../components/Toast'
@@ -39,6 +40,8 @@ export function Upload() {
         <Button block onClick={() => { uploads.clear(); navigate('/') }}>Voir l'album</Button>
         <Button block variant="tonal" onClick={() => addPhotos.current?.open()}>Ajouter d'autres photos</Button>
         <AddPhotos ref={addPhotos} />
+        <Bouquet corner="top-left" width={260} x={50} y={40} opacity={0.25} />
+        <Bouquet corner="bottom-right" width={250} x={60} y={50} opacity={0.25} />
       </main>
     )
   }
